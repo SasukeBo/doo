@@ -1,4 +1,4 @@
-module sasukebo/gitlab-helper
+module sasukebo/doo
 
 go 1.18
 

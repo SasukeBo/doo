@@ -8,8 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sasukebo/gitlab-helper/gitlab/client"
-	"sasukebo/gitlab-helper/utils"
+	"sasukebo/doo/gitlab/client"
+	"sasukebo/doo/utils"
 	"strings"
 
 	"github.com/urfave/cli/v2"
@@ -41,7 +41,7 @@ func CodeLineSummary(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	root, err = utils.MustGetStringArg(ctx, "root", "DMF_GITLAB_SYNC_ROOT")
+	root, err = utils.MustGetStringArg(ctx, "root", "DOO_GITLAB_SYNC_ROOT")
 	if err != nil {
 		return err
 	}

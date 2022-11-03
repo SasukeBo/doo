@@ -3,14 +3,14 @@ package main
 import (
 	"log"
 	"os"
-	"sasukebo/gitlab-helper/gitlab"
+	"sasukebo/doo/gitlab"
 
 	"github.com/urfave/cli/v2"
 )
 
 func main() {
 	app := &cli.App{
-		Name:  "dmf",
+		Name:  "doo",
 		Usage: "Do me a favor. 集成一些小工具来提高工作效率",
 		Commands: []*cli.Command{
 			{
@@ -19,11 +19,11 @@ func main() {
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:  "host",
-						Usage: "gitlab service host, same as env `DMF_GITLAB_HOST`",
+						Usage: "gitlab service host, same as env `DOO_GITLAB_HOST`",
 					},
 					&cli.StringFlag{
 						Name:    "access_token",
-						Usage:   "gitlab personal access_token, same as env `DMF_GITLAB_ACCESS_TOKEN`",
+						Usage:   "gitlab personal access_token, same as env `DOO_GITLAB_ACCESS_TOKEN`",
 						Aliases: []string{"t"},
 					},
 				},
@@ -34,7 +34,7 @@ func main() {
 						Flags: []cli.Flag{
 							&cli.StringFlag{
 								Name:    "root",
-								Usage:   "root path, same as env `DMF_GITLAB_SYNC_ROOT`",
+								Usage:   "root path, same as env `DOO_GITLAB_SYNC_ROOT`",
 								Aliases: []string{"r"},
 							},
 							&cli.StringFlag{
@@ -51,7 +51,7 @@ func main() {
 						Flags: []cli.Flag{
 							&cli.StringFlag{
 								Name:    "root",
-								Usage:   "root path, same as env `DMF_GITLAB_SYNC_ROOT`",
+								Usage:   "root path, same as env `DOO_GITLAB_SYNC_ROOT`",
 								Aliases: []string{"r"},
 							},
 							&cli.StringFlag{
@@ -74,6 +74,15 @@ func main() {
 							},
 						},
 						Action: gitlab.InitProject,
+					},
+					{
+						Name:  "force_delete_tag",
+						Usage: "delete tag for project, ignore protect",
+						Flags: []cli.Flag{
+							&cli.StringFlag{Name: "project", Usage: "target `PROJECT`", Aliases: []string{"p"}, Required: true},
+							&cli.StringFlag{Name: "group", Usage: "target `GROUP`", Aliases: []string{"g"}, Required: true},
+						},
+						Action: gitlab.ForceDeleteTag,
 					},
 				},
 			},

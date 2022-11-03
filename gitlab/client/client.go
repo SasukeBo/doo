@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"sasukebo/gitlab-helper/utils"
+	"sasukebo/doo/utils"
 	"sync"
 
 	"github.com/urfave/cli/v2"
@@ -28,11 +28,11 @@ func Init(ctx *cli.Context) error {
 		host  string
 		token string
 	)
-	host, err = utils.MustGetStringArg(ctx, "host", "DMF_GITLAB_HOST")
+	host, err = utils.MustGetStringArg(ctx, "host", "DOO_GITLAB_HOST")
 	if err != nil {
 		return err
 	}
-	token, err = utils.MustGetStringArg(ctx, "access_token", "DMF_GITLAB_ACCESS_TOKEN")
+	token, err = utils.MustGetStringArg(ctx, "access_token", "DOO_GITLAB_ACCESS_TOKEN")
 	if err != nil {
 		return err
 	}
@@ -176,4 +176,9 @@ func ProtectProjectBranch(id int, branch string, levels []int) error {
 		return fmt.Errorf("[ERROR] protect branch failed for id %v: %v", id, string(body))
 	}
 	return nil
+}
+
+func DeleteProjectTag(id int, tag string) error {
+	_, err := c.Tags.DeleteTag(id, tag)
+	return err
 }

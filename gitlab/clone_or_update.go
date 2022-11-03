@@ -3,8 +3,8 @@ package gitlab
 import (
 	"fmt"
 	"os"
-	"sasukebo/gitlab-helper/gitlab/client"
-	"sasukebo/gitlab-helper/utils"
+	"sasukebo/doo/gitlab/client"
+	"sasukebo/doo/utils"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
@@ -23,7 +23,7 @@ func GenerateLocalDirectories(ctx *cli.Context) error {
 		gs          = make(map[string]struct{})
 	)
 
-	accessToken, err = utils.MustGetStringArg(ctx, "access_token", "DMF_GITLAB_ACCESS_TOKEN")
+	accessToken, err = utils.MustGetStringArg(ctx, "access_token", "DOO_GITLAB_ACCESS_TOKEN")
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func GenerateLocalDirectories(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	root, err = utils.MustGetStringArg(ctx, "root", "DMF_GITLAB_SYNC_ROOT")
+	root, err = utils.MustGetStringArg(ctx, "root", "DOO_GITLAB_SYNC_ROOT")
 	if err != nil {
 		return err
 	}

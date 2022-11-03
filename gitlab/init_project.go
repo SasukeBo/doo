@@ -2,8 +2,8 @@ package gitlab
 
 import (
 	"fmt"
-	"sasukebo/gitlab-helper/gitlab/client"
-	"sasukebo/gitlab-helper/utils"
+	"sasukebo/doo/gitlab/client"
+	"sasukebo/doo/utils"
 	"strconv"
 	"strings"
 
