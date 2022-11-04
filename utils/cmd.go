@@ -18,13 +18,17 @@ func Now(_ *cli.Context) error {
 }
 
 func CD(ctx *cli.Context) error {
+	if ctx.NArg() == 0 {
+		fmt.Println("missing dir")
+		return nil
+	}
 	root := ctx.String("root")
 	if !IsDir(root) {
 		fmt.Printf("%s is not a path\n", root)
 		return nil
 	}
 
-	cmd := exec.Command("find", root, "-name", ctx.String("dir"))
+	cmd := exec.Command("find", root, "-name", ctx.Args().Get(0))
 	cmd.Stdout = os.Stdout
 	if err := cmd.Run(); err != nil {
 		return err

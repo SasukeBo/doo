@@ -87,9 +87,8 @@ var _now = &cli.Command{Name: "now", Action: utils.Now}
 
 var _find = &cli.Command{
 	Name:  "find",
-	Usage: "find workdir to target directory",
+	Usage: "find workdir to target directory, doo find -r / my_directory",
 	Flags: []cli.Flag{
-		&cli.StringFlag{Name: "dir", Usage: "target `DIRECTORY`", Aliases: []string{"d"}, Required: true},
 		&cli.StringFlag{Name: "root", Usage: "find target dir inside root path", Aliases: []string{"r"}, Required: false, Value: "/Users/sasukebo/workspace"},
 	},
 	Action: utils.CD,
