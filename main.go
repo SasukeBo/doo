@@ -83,13 +83,26 @@ var _gitlab = &cli.Command{
 	},
 }
 
+var _now = &cli.Command{Name: "now", Action: utils.Now}
+
+var _find = &cli.Command{
+	Name:  "find",
+	Usage: "find workdir to target directory",
+	Flags: []cli.Flag{
+		&cli.StringFlag{Name: "dir", Usage: "target `DIRECTORY`", Aliases: []string{"d"}, Required: true},
+		&cli.StringFlag{Name: "root", Usage: "find target dir inside root path", Aliases: []string{"r"}, Required: false, Value: "/Users/sasukebo/workspace"},
+	},
+	Action: utils.CD,
+}
+
 func main() {
 	app := &cli.App{
 		Name:  "doo",
 		Usage: "Do me a favor. 集成一些小工具来提高工作效率",
 		Commands: []*cli.Command{
 			_gitlab,
-			{Name: "now", Action: utils.Now},
+			_now,
+			_find,
 		},
 	}
 

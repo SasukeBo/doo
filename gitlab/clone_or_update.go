@@ -67,21 +67,12 @@ func GenerateLocalDirectories(ctx *cli.Context) error {
 			fmt.Printf("--- [ERROR] Make dir for group %s failed: %v\n", group.Name, dir)
 		}
 
-		if isDir(dir) {
+		if utils.IsDir(dir) {
 			fmt.Printf("--- [INFO] Clone or update projects for group %s\n", group.Name)
 			cloneOrUpdateProjects(group, accessToken, root)
 		}
 	}
 	return nil
-}
-
-func isDir(dir string) bool {
-	f, err := os.Stat(dir)
-	if err != nil {
-		return false
-	}
-
-	return f.IsDir()
 }
 
 func cloneOrUpdateProjects(group *gitlab.Group, accessToken, root string) {
@@ -93,7 +84,7 @@ func cloneOrUpdateProjects(group *gitlab.Group, accessToken, root string) {
 	}
 	for _, project := range projects {
 		projectDir := fmt.Sprintf("%s/%s/%s", root, group.FullPath, project.Path)
-		if isDir(projectDir) {
+		if utils.IsDir(projectDir) {
 			fmt.Printf("--- [INFO] Pull project %s\n", project.Name)
 			if repo, err := git.PlainOpen(projectDir); err == nil {
 				if w, err := repo.Worktree(); err == nil {

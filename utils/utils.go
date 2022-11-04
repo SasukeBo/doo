@@ -17,3 +17,12 @@ func MustGetStringArg(ctx *cli.Context, name, env string) (v string, err error) 
 	}
 	return
 }
+
+func IsDir(dir string) bool {
+	f, err := os.Stat(dir)
+	if err != nil {
+		return false
+	}
+
+	return f.IsDir()
+}
