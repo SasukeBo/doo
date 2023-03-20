@@ -123,6 +123,7 @@ func CleanArtifacts(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	disableIgnore := ctx.Bool("disable_ignore")
 
 	repository = ctx.String("repository")
 	var repositories []string
@@ -173,7 +174,7 @@ func CleanArtifacts(ctx *cli.Context) error {
 				// fmt.Printf("%s %v\n", t.Name, ignoreTagExp.MatchString(t.Name))
 				ignore = ignore || ignoreTagExp.MatchString(t.Name)
 			}
-			if ignore {
+			if ignore && !disableIgnore {
 				continue
 			}
 			digests = append(digests, a.Digest)
@@ -320,5 +321,101 @@ func deleteArtifact(project, repo, sha string, config *Config) error {
 	}
 
 	fmt.Printf("DELETE %s ok\n", sha)
+	return nil
+}
+
+func DeleteProject(ctx *cli.Context) error {
+	config, err := getConfig(ctx)
+	if err != nil {
+		return err
+	}
+	project, err := utils.MustGetStringArg(ctx, "project", "")
+	if err != nil {
+		return err
+	}
+	var repositoryNames []string
+	var page, limit = 1, 100
+	for {
+		names, err := getRepositories(project, config, page, limit)
+		if err != nil {
+			return err
+		}
+		repositoryNames = append(repositoryNames, names...)
+		if len(names) < limit {
+			break
+		} else {
+			page++
+		}
+	}
+
+	var (
+		deleteChan = make(chan string, 10)
+		finishChan = make(chan struct{}, 5)
+	)
+
+	for i := 0; i < 10; i++ {
+		go func() {
+			for {
+				select {
+				case repo := <-deleteChan:
+					deleteRepository(project, repo, config)
+					finishChan <- struct{}{}
+				}
+			}
+		}()
+	}
+
+	go func() {
+		for _, name := range repositoryNames {
+			deleteChan <- name
+		}
+	}()
+
+	var finished int
+	for {
+		select {
+		case <-finishChan:
+			finished++
+		}
+		if finished == len(repositoryNames) {
+			break
+		}
+	}
+
+	uri := fmt.Sprintf("%s/projects/%s", apiAddress, project)
+	req, err := http.NewRequest(http.MethodDelete, uri, nil)
+	if err != nil {
+		return err
+	}
+	setHeader(req, config)
+	rsp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	content, _ := ioutil.ReadAll(rsp.Body)
+	if rsp.StatusCode != http.StatusOK {
+		return fmt.Errorf(string(content))
+	}
+	fmt.Printf("%s deleted\n", project)
+	return nil
+}
+
+func deleteRepository(project, repository string, config *Config) error {
+	uri := fmt.Sprintf("%s/projects/%s/repositories/%s", apiAddress, project, repository)
+	req, err := http.NewRequest(http.MethodDelete, uri, nil)
+	if err != nil {
+		return err
+	}
+	setHeader(req, config)
+	rsp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	content, _ := ioutil.ReadAll(rsp.Body)
+	if rsp.StatusCode != http.StatusOK {
+		return fmt.Errorf(string(content))
+	}
+
+	fmt.Println("delete", project+"/"+repository)
 	return nil
 }

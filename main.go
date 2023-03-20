@@ -118,8 +118,17 @@ var _harbor = &cli.Command{
 				&cli.StringFlag{Name: "project", Usage: "指定项目名称", Aliases: []string{"p"}},
 				&cli.StringFlag{Name: "repository", Usage: "指定仓库名称，如果不指定则清理整个项目", Aliases: []string{"r"}},
 				&cli.StringFlag{Name: "days_not_pulled", Usage: "清理N天内没有被拉取过的镜像", Aliases: []string{"d"}},
+				&cli.BoolFlag{Name: "disable_ignore", Usage: "取消对有标签的镜像过滤", Aliases: []string{"i"}},
 			},
 			Action: harbor.CleanArtifacts,
+		},
+		{
+			Name:  "delete_project",
+			Usage: "删除项目",
+			Flags: []cli.Flag{
+				&cli.StringFlag{Name: "project", Usage: "指定项目名称", Aliases: []string{"p"}},
+			},
+			Action: harbor.DeleteProject,
 		},
 	},
 }
