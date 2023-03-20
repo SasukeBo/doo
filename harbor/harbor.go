@@ -127,7 +127,7 @@ func CleanArtifacts(ctx *cli.Context) error {
 	repository = ctx.String("repository")
 	var repositories []string
 	if repository != "" {
-		repositories = append(repositories, repository)
+		repositories = append(repositories, strings.Split(repository, ",")...)
 	} else {
 		var page, limit = 1, 100
 		for {
@@ -144,13 +144,29 @@ func CleanArtifacts(ctx *cli.Context) error {
 		}
 	}
 
+	var deleteChan = make(chan *D, 5)
+	var finishChan = make(chan struct{}, 5)
+
+	for i := 0; i < 5; i++ {
+		go func(dc chan *D, fc chan struct{}) {
+			for {
+				select {
+				case d := <-dc:
+					deleteArtifact(project, d.Repo, d.Digest, config)
+					fc <- struct{}{}
+				}
+			}
+		}(deleteChan, finishChan)
+	}
+
 	for _, repo := range repositories {
 		fmt.Println("[INFO] process repo:", repo)
 		artifacts, err := getTotalArtifacts(project, repo, day, config)
 		if err != nil {
 			return err
 		}
-		var total int
+
+		var digests []string
 		for _, a := range artifacts {
 			var ignore bool
 			for _, t := range a.Tags {
@@ -160,13 +176,38 @@ func CleanArtifacts(ctx *cli.Context) error {
 			if ignore {
 				continue
 			}
-			total++
-			deleteArtifact(project, repo, a.Digest, config)
+			digests = append(digests, a.Digest)
 		}
-		fmt.Println("find:", len(artifacts), "deleted:", total)
+		var total = len(digests)
+		if total > 0 {
+			go func(dc chan *D, _total *int) {
+				for _, digest := range digests {
+					dc <- &D{repo, digest}
+				}
+			}(deleteChan, &total)
+
+			var finishCount int
+			for {
+				select {
+				case <-finishChan:
+					finishCount++
+				}
+
+				if total == finishCount {
+					break
+				}
+			}
+		}
+
+		fmt.Println(repo, "find:", len(artifacts), "deleted:", total)
 	}
 
 	return nil
+}
+
+type D struct {
+	Repo   string
+	Digest string
 }
 
 func getRepositories(project string, config *Config, page, limit int) ([]string, error) {
