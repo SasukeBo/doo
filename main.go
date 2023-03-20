@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"sasukebo/doo/gitlab"
+	"sasukebo/doo/harbor"
 	"sasukebo/doo/utils"
 
 	"github.com/urfave/cli/v2"
@@ -94,6 +95,35 @@ var _find = &cli.Command{
 	Action: utils.CD,
 }
 
+var _harbor = &cli.Command{
+	Name:  "harbor",
+	Usage: "执行一些Harbor的辅助功能",
+	Flags: []cli.Flag{
+		&cli.StringFlag{Name: "config", Usage: "指定Harbor api v2.0的Authorization信息文件地址", Aliases: []string{"c"}, Required: true},
+	},
+	Subcommands: []*cli.Command{
+		{
+			Name:  "delete_artifact_by_reference",
+			Usage: "删除指定的镜像版本",
+			Flags: []cli.Flag{
+				&cli.StringFlag{Name: "project", Usage: "指定项目名称", Aliases: []string{"p"}},
+				&cli.StringFlag{Name: "repository", Usage: "指定仓库名称", Aliases: []string{"r"}},
+			},
+			Action: harbor.DeleteTagetArtifacts,
+		},
+		{
+			Name:  "clean_artifacts",
+			Usage: "清理N天未被拉取过的，且无标签的镜像文件",
+			Flags: []cli.Flag{
+				&cli.StringFlag{Name: "project", Usage: "指定项目名称", Aliases: []string{"p"}},
+				&cli.StringFlag{Name: "repository", Usage: "指定仓库名称，如果不指定则清理整个项目", Aliases: []string{"r"}},
+				&cli.StringFlag{Name: "days_not_pulled", Usage: "清理N天内没有被拉取过的镜像", Aliases: []string{"d"}},
+			},
+			Action: harbor.CleanArtifacts,
+		},
+	},
+}
+
 func main() {
 	app := &cli.App{
 		Name:  "doo",
@@ -102,6 +132,7 @@ func main() {
 			_gitlab,
 			_now,
 			_find,
+			_harbor,
 		},
 	}
 

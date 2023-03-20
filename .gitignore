@@ -2,4 +2,4 @@ go.sum
 doo
 doo.exe
 .idea
-
+test_harbor_auth_config.json
