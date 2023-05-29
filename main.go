@@ -6,6 +6,7 @@ import (
 	"sasukebo/doo/gitlab"
 	"sasukebo/doo/harbor"
 	"sasukebo/doo/utils"
+	"sasukebo/doo/vultr"
 
 	"github.com/urfave/cli/v2"
 )
@@ -142,6 +143,7 @@ func main() {
 			_now,
 			_find,
 			_harbor,
+			vultr.Cmd,
 		},
 	}
 
