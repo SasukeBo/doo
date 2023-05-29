@@ -12,8 +12,9 @@ import (
 )
 
 var Cmd = &cli.Command{
-	Name:  "vultr",
-	Usage: "执行一些vultr的辅助功能",
+	Name:    "vultr",
+	Usage:   "执行一些vultr的辅助功能",
+	Aliases: []string{"v"},
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "key",
