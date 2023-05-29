@@ -193,7 +193,8 @@ func deleteInstance(ctx *cli.Context) error {
 	if ctx.NArg() != 1 {
 		return fmt.Errorf("missing instance id")
 	}
-	req, err := newRequest(accessToken, "v2/instances/"+ctx.Args().First(), http.MethodDelete, nil)
+	id = ctx.Args().First()
+	req, err := newRequest(accessToken, "v2/instances/"+id, http.MethodDelete, nil)
 	if err != nil {
 		return err
 	}
