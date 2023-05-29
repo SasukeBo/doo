@@ -172,9 +172,9 @@ func showStatus(ctx *cli.Context) error {
 	if err = json.Unmarshal(content, &_rsp); err != nil {
 		return err
 	}
-	fmt.Printf("%-36s %-10s %-7s %-15s\n", "ID", "Label", "Status", "IP")
+	fmt.Printf("%-36s %-50s %-7s %-15s\n", "ID", "Label", "Status", "IP")
 	for _, i := range _rsp.Instances {
-		fmt.Printf("%-36s %-10s %s %-15s\n", i.Id, i.Label, i.Status, i.IP)
+		fmt.Printf("%-36s %-50s %s %-15s\n", i.Id, i.Label, i.Status, i.IP)
 	}
 
 	return nil
