@@ -57,7 +57,8 @@ func GenerateLocalDirectories(ctx *cli.Context) error {
 	}
 
 	for _, group := range groups {
-		if _, ok := gs[group.FullName]; len(gs) > 0 && !ok {
+		// fmt.Println("--- [debug]", group.FullName, group.Name, group.FullPath)
+		if _, ok := gs[group.FullPath]; len(gs) > 0 && !ok {
 			continue
 		}
 		dir := fmt.Sprintf("%s/%s", root, group.FullPath)
