@@ -24,6 +24,11 @@ var Cmd = &cli.Command{
 	},
 	Subcommands: []*cli.Command{
 		{
+			Name:   "account",
+			Usage:  "show account info",
+			Action: showAccountInfo,
+		},
+		{
 			Name:   "show",
 			Usage:  "show instance by id",
 			Action: showInstance,
@@ -225,6 +230,39 @@ func showInstance(ctx *cli.Context) error {
 		return fmt.Errorf("missing instance id")
 	}
 	req, err := newRequest(accessToken, "v2/instances/"+ctx.Args().First(), http.MethodGet, nil)
+	if err != nil {
+		return err
+	}
+	rsp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	content, _ := ioutil.ReadAll(rsp.Body)
+	rsp.Body.Close()
+	if rsp.StatusCode != http.StatusOK {
+		fmt.Printf("StatusCode:%v, rsp: %s\n", rsp.StatusCode, string(content))
+		return nil
+	}
+	var data = make(map[string]interface{})
+	if err = json.Unmarshal(content, &data); err != nil {
+		return err
+	}
+	_mc, _ := json.MarshalIndent(data, "", " ")
+	fmt.Println(string(_mc))
+
+	return nil
+}
+
+func showAccountInfo(ctx *cli.Context) error {
+	var (
+		err         error
+		accessToken string
+	)
+	accessToken, err = utils.MustGetStringArg(ctx, "key", "DOO_VULTR_API_KEY")
+	if err != nil {
+		return err
+	}
+	req, err := newRequest(accessToken, "v2/account", http.MethodGet, nil)
 	if err != nil {
 		return err
 	}
