@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sasukebo/doo/utils"
+	"time"
 
 	"github.com/urfave/cli/v2"
 )
@@ -253,6 +254,20 @@ func showInstance(ctx *cli.Context) error {
 	return nil
 }
 
+type AccountInfoData struct {
+	Account *AccountInfo `json:"account"`
+}
+
+type AccountInfo struct {
+	Acls              []string `json:"acls"`
+	Balance           float64  `json:"balance"`
+	Email             string   `json:"email"`
+	LastPaymentAmount float64  `json:"last_payment_amount"`
+	LastPaymentDate   string   `json:"last_payment_date"`
+	Name              string   `json:"name"`
+	PendingCharges    float64  `json:"pending_charges"`
+}
+
 func showAccountInfo(ctx *cli.Context) error {
 	var (
 		err         error
@@ -276,12 +291,23 @@ func showAccountInfo(ctx *cli.Context) error {
 		fmt.Printf("StatusCode:%v, rsp: %s\n", rsp.StatusCode, string(content))
 		return nil
 	}
-	var data = make(map[string]interface{})
+	var data AccountInfoData
 	if err = json.Unmarshal(content, &data); err != nil {
 		return err
 	}
-	_mc, _ := json.MarshalIndent(data, "", " ")
-	fmt.Println(string(_mc))
+
+	l := time.FixedZone("Asia/Shanghai", 8*3600)
+	t, _ := time.ParseInLocation(time.RFC3339, data.Account.LastPaymentDate, l)
+
+	fmt.Printf("%-15s %s %s %-15s %s\n", "账号", "余额", "本月支出", "最近充值时间", "最近充值额度")
+	fmt.Printf(
+		"%-17s %s %-8s %-21s %s\n",
+		data.Account.Name,
+		fmt.Sprintf("%.2f", -data.Account.Balance),
+		fmt.Sprintf("%.2f", data.Account.PendingCharges),
+		t.In(l).Format("2006-01-02 15:04:05"),
+		fmt.Sprintf("%.2f", -data.Account.LastPaymentAmount),
+	)
 
 	return nil
 }
