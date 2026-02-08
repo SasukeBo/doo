@@ -114,7 +114,7 @@ func newInstance(ctx *cli.Context) error {
 			"region":      "sea",
 			"plan":        "vc2-1c-1gb",
 			"label":       _label,
-			"os_id":       1946,
+			"os_id":       1743,
 			"script_id":   "e2b38130-ca00-4903-8dc3-4ea0d153e374",
 			"enable_ipv6": false,
 			"backups":     "disabled",
